@@ -14,10 +14,10 @@ function Navigation() {
           </Link>
         </div>
 
-        <div className="hidden xl:block xl:w-1/3">
+        <div className="xl:block xl:w-1/3">
           <div className="flex items-center justify-end">
             <Link
-              class="text-coolGray-500 hover:text-coolGray-900 font-medium"
+              className="text-coolGray-500 hover:text-coolGray-900 font-medium"
               href="/"
             >
               Home
