@@ -80,8 +80,6 @@ export default function Restaurant() {
   if (data.restaurant.data.attributes.dishes.data.length) {
     const { restaurant } = data;
 
-    console.log(restaurant);
-
     return (
       <div>
         <h1 className="text-2xl text-green-600">

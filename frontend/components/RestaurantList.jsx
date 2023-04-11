@@ -62,8 +62,6 @@ function RestaurantCard({ data }) {
 function RestaurantList(props) {
   const { loading, error, data } = useQuery(QUERY);
 
-  console.log(data);
-
   if (error) return "Error loading restaurants";
   if (loading) return <h1>Fetching</h1>;
 
