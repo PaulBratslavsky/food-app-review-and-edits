@@ -26,27 +26,26 @@ export default function RegisterRoute() {
   const [formData, setFormData] = useState({ email: '', password: '' })
   const [registerMutation, { loading, error }] = useMutation(REGISTER_MUTATION)
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>Error: {error.message}</div>
-
   const handleRegister = async () => {
     const { email, password } = formData
     const { data } = await registerMutation({ variables: { username: email, email: email, password } })
-    console.log(data, "on registyer")
-    debugger;
-    setUser(data.register.user);
-    router.push("/")
-    Cookie.set("token", data.register.jwt);
+    if (data?.register.user) {
+      setUser(data.register.user);
+      router.push("/")
+      Cookie.set("token", data.register.jwt);
+    }
   }
 
   if (loading) return <div>Loading...</div>
-  if (error) return <div>Error: {error.message}</div>
 
-  return <Form
-    title="Sign Up"
-    buttonText="Sign Up"
-    formData={formData}
-    setFormData={setFormData}
-    callback={handleRegister}
-  />
+  return (
+    <Form
+      title="Sign Up"
+      buttonText="Sign Up"
+      formData={formData}
+      setFormData={setFormData}
+      callback={handleRegister}
+      error={error}
+    />
+  );
 }

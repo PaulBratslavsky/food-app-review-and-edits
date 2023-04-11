@@ -27,19 +27,23 @@ export default function LoginRoute() {
   const handleLogin = async () => {
     const { email, password } = formData
     const { data } = await loginMutation({ variables: { identifier: email, password } })
-    setUser(data.login.user);
-    router.push("/")
-    Cookie.set("token", data.login.jwt);
+    if (data?.login.user) {
+      setUser(data.login.user);
+      router.push("/")
+      Cookie.set("token", data.login.jwt);
+    }
   }
 
   if (loading) return <div>Loading...</div>
-  if (error) return <div>Error: {error.message}</div>
 
-  return <Form
-    title="Login"
-    buttonText="Login"
-    formData={formData}
-    setFormData={setFormData}
-    callback={handleLogin}
-  />
+  return (
+      <Form
+        title="Login"
+        buttonText="Login"
+        formData={formData}
+        setFormData={setFormData}
+        callback={handleLogin}
+        error={error}
+      />    
+  );
 }

@@ -40,7 +40,7 @@ function Navigation() {
             >
               Home
             </Link>
-            <div className="hxl:block xl:w-1/3">
+            <div className="hxl:block">
               {user ? (
                 <div className="flex items-center justify-end">
                   <span className="inline-block py-2 px-4 mr-2 leading-5 text-coolGray-500 hover:text-coolGray-900 bg-transparent font-medium rounded-md">
