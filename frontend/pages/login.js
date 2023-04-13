@@ -29,8 +29,8 @@ export default function LoginRoute() {
     const { data } = await loginMutation({ variables: { identifier: email, password } })
     if (data?.login.user) {
       setUser(data.login.user);
-      router.push("/")
       Cookie.set("token", data.login.jwt);
+      router.push("/")
     }
   }
 

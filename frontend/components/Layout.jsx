@@ -10,10 +10,6 @@ function Navigation() {
   const { user, setUser } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (user) router.push("/");
-  }, [user]);
-
   function handleLogout() {
     setUser(null);
     Cookie.remove("token");
@@ -78,7 +74,7 @@ function Navigation() {
 }
 
 export default function Layout(props) {
-  const title = "Welcome to Nextjs";
+  const title = "Welcome to Next JS";
 
   return (
     <div>

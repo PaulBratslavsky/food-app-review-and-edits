@@ -1,5 +1,4 @@
 import { useState, createContext, useContext, useEffect } from "react";
-import Router from "next/router";
 import Cookie from "js-cookie";
 import { gql } from "@apollo/client";
 import { client } from "@/pages/_app.js";
@@ -8,20 +7,71 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [cart, setCart] = useState(JSON.parse(Cookie.get("cart") || "{}") || {
+    items: [],
+    total: 0,
+  });
+
   useEffect(() => {
     const fetchData = async () => {
-      const userData = await getUser(client);
+      const userData = await getUser();
       setUser(userData);
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    Cookie.set("cart", JSON.stringify(cart));
+  }, [cart]);
+
+  const addItem = item => {
+    let newItem = cart.items.find(i => i.id === item.id);
+    if (!newItem) {
+      const newItem = {
+        quantity: 1,
+        ...item,
+      };
+      setCart(prevCart => ({
+        items: [...prevCart.items, newItem],
+        total: prevCart.total + item.attributes.price,
+      }));
+    } else {
+      setCart(prevCart => ({
+        items: prevCart.items.map(i =>
+          i.id === newItem.id
+            ? { ...i, quantity: i.quantity + 1 }
+            : i
+        ),
+        total: prevCart.total + item.attributes.price,
+      }));
+    }
+  };
+
+  const removeItem = item => {
+    let newItem = cart.items.find(i => i.id === item.id);
+    if (newItem.quantity > 1) {
+      setCart(prevCart => ({
+        items: prevCart.items.map(i =>
+          i.id === newItem.id
+            ? { ...i, quantity: i.quantity - 1 }
+            : i
+        ),
+        total: prevCart.total - item.attributes.price,
+      }));
+    } else {
+      setCart(prevCart => ({
+        items: prevCart.items.filter(i => i.id !== item.id),
+        total: prevCart.total - item.attributes.price,
+      }));
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser, cart, addItem, removeItem }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
 
 const getUser = async () => {
   const token = Cookie.get("token");
@@ -44,7 +94,6 @@ const getUser = async () => {
   });
   return data.me;
 };
-
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
