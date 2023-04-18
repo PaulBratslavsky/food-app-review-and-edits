@@ -6,11 +6,11 @@ import { client } from "@/pages/_app.js";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const cartCookie = Cookie.get("cart") !== "undefined" ? Cookie.get("cart") : null;
+  
   const [user, setUser] = useState(null);
-  const [cart, setCart] = useState(JSON.parse(Cookie.get("cart") || "{}") || {
-    items: [],
-    total: 0,
-  });
+  const [showCart, setShowCart] = useState(true);
+  const [cart, setCart] = useState(cartCookie ? JSON.parse(cartCookie) : { items: [], total: 0 });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, cart, addItem, removeItem }}>
+    <AuthContext.Provider value={{ user, setUser, cart, addItem, removeItem, showCart, setShowCart }}>
       {children}
     </AuthContext.Provider>
   );
