@@ -1,6 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import Link from "next/link";
 import Image from "next/image";
+import Loader from './Loader';
 
 const QUERY = gql`
   {
@@ -25,7 +26,7 @@ const QUERY = gql`
 
 function RestaurantCard({ data }) {
   return (
-    <div className="w-full md:w-1/3 p-4">
+    <div className="w-full md:w-1/2 lg:w-1/3 p-4">
       <div className="h-full bg-gray-100 rounded-2xl">
         <Image
           className="w-full rounded-2xl"
@@ -63,7 +64,7 @@ function RestaurantList(props) {
   const { loading, error, data } = useQuery(QUERY);
 
   if (error) return "Error loading restaurants";
-  if (loading) return <h1>Fetching</h1>;
+  if (loading) return <Loader />;
 
   if (data.restaurants.data && data.restaurants.data.length) {
     

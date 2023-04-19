@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
 
 import Image from "next/image";
+import Loader from '@/components/Loader';
 
 const GET_RESTAURANT_DISHES = gql`
   query ($id: ID!) {
@@ -38,7 +39,8 @@ function DishCard({ data }) {
   const { addItem } = useAuth();
 
   return (
-    <div className="w-full md:w-1/3 p-4">
+    <div className="w-full md:w-1/2 lg:w-1/3 p-4">
+
       <div className="h-full bg-gray-100 rounded-2xl">
         <Image
           className="w-full rounded-2xl"
@@ -82,13 +84,13 @@ export default function Restaurant() {
   });
 
   if (error) return "Error Loading Dishes";
-  if (loading) return <h1>Loading ...</h1>;
+  if (loading) return <Loader />;
   if (data.restaurant.data.attributes.dishes.data.length) {
     const { restaurant } = data;
 
     return (
-      <div>
-        <h1 className="text-2xl text-green-600">
+      <div className='py-6'>
+        <h1 className="text-4xl font-bold text-green-600">
           {restaurant.data.attributes.name}
         </h1>
         <div className="py-16 px-8 bg-white rounded-3xl">

@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router';
-import Form from '@/components/Form'
 import { useAuth } from '@/context/AuthContext'
-import Cookie from "js-cookie";
 import { gql, useMutation } from '@apollo/client'
+import Cookie from "js-cookie";
+
+import Form from '@/components/Form'
+import Loader from '@/components/Loader';
 
 const LOGIN_MUTATION = gql`
   mutation Login($identifier: String!, $password: String!) {
@@ -34,7 +36,7 @@ export default function LoginRoute() {
     }
   }
 
-  if (loading) return <div>Loading...</div>
+  if (loading) return <Loader />
 
   return (
       <Form
