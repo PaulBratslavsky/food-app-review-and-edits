@@ -1,7 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { centsToDollars } from "@/utils/centsToDollars";
 import { useRouter } from "next/router";
-import { useAuth } from "@/context/AuthContext";
+import { useAppContext } from "@/context/AppContext";
 
 import Image from "next/image";
 import Loader from '@/components/Loader';
@@ -37,7 +37,7 @@ const GET_RESTAURANT_DISHES = gql`
 `;
 
 function DishCard({ data }) {
-  const { addItem, setShowCart } = useAuth();
+  const { addItem, setShowCart } = useAppContext();
 
   function handleAddItem() {
     addItem(data);

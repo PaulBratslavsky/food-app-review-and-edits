@@ -1,8 +1,8 @@
-import { useAuth } from "@/context/AuthContext";
+import { useAppContext } from "@/context/AppContext";
 import { centsToDollars } from "@/utils/centsToDollars";
 
 function CartItem({ data }) {
-  const { addItem, removeItem } = useAuth();
+  const { addItem, removeItem } = useAppContext();
   const { quantity, attributes } = data;
   return (
     <div className="p-6 flex flex-wrap justify-between border-b border-blueGray-800">
@@ -40,7 +40,7 @@ function CartItem({ data }) {
 }
 
 export default function CheckoutCart() {
-  const { cart } = useAuth();
+  const { cart } = useAppContext();
   const total = cart.total;
   const displayTotal = Math.abs(total);
 

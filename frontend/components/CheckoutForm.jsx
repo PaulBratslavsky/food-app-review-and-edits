@@ -1,9 +1,9 @@
 import React, { useState } from "react";
+import Cookie from "js-cookie";
 import { client } from "@/pages/_app.js";
 import { gql } from "@apollo/client";
-import Cookie from "js-cookie";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { useAuth } from "@/context/AuthContext";
+import { useAppContext } from "@/context/AppContext";
 import { useRouter } from "next/router";
 import { useInitialRender } from "@/utils/useInitialRender";
 
@@ -32,14 +32,15 @@ const INITIAL_STATE = {
 export default function CheckoutForm() {
   const [data, setData] = useState(INITIAL_STATE);
   const [loading, setLoading] = useState(false);
-  const { user, cart, resetCart, setShowCart } = useAuth();
+  const { user, cart, resetCart, setShowCart } = useAppContext();
 
   const initialRender = useInitialRender();
-  if (!initialRender) return null;
 
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
+
+  if (!initialRender) return null;
 
   function onChange(e) {
     const updateItem = (data[e.target.name] = e.target.value);
@@ -76,11 +77,7 @@ export default function CheckoutForm() {
     try {
       setLoading(true);
 
-      const {
-        data: response,
-        error,
-        loading,
-      } = await client.mutate({
+      const { data: response } = await client.mutate({
         mutation: gql`
           mutation CreateOrder(
             $amount: Int

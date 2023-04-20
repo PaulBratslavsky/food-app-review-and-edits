@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import { useAuth } from "@/context/AuthContext";
+import { useAppContext } from "@/context/AppContext";
 import Cookie from "js-cookie";
 const Cart = dynamic(() => import("@/components/Cart"), { ssr: false });
 
@@ -8,7 +8,7 @@ import Head from "next/head";
 import Link from "next/link";
 
 function Navigation() {
-  const { user, setUser } = useAuth();
+  const { user, setUser } = useAppContext();
   const router = useRouter();
 
   function handleLogout() {

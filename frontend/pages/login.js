@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router';
-import { useAuth } from '@/context/AuthContext'
+import { useAppContext } from '@/context/AppContext'
 import { gql, useMutation } from '@apollo/client'
 import Cookie from "js-cookie";
 
@@ -20,7 +20,7 @@ const LOGIN_MUTATION = gql`
 `;
 
 export default function LoginRoute() {
-  const { setUser } = useAuth()
+  const { setUser } = useAppContext()
   const router = useRouter()
 
   const [formData, setFormData] = useState({ email: '', password: '' })

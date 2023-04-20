@@ -1,9 +1,9 @@
-import { useAuth } from "@/context/AuthContext";
+import { useAppContext } from "@/context/AppContext";
 import { useRouter } from "next/router";
 import { centsToDollars } from "@/utils/centsToDollars";
 
 function CartItem({ data }) {
-  const { addItem, removeItem } = useAuth();
+  const { addItem, removeItem } = useAppContext();
   const { quantity, attributes } = data;
 
   return (
@@ -43,8 +43,7 @@ function CartItem({ data }) {
 
 export default function Cart() {
   const router = useRouter();
-
-  const { user, cart, showCart, setShowCart } = useAuth();
+  const { user, cart, showCart, setShowCart } = useAppContext();
   const total = cart.total;
   const displayTotal = Math.abs(total);
 

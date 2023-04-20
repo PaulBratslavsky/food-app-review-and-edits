@@ -3,9 +3,9 @@ import Cookie from "js-cookie";
 import { gql } from "@apollo/client";
 import { client } from "@/pages/_app.js";
 
-const AuthContext = createContext();
+const AppContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+export const AppProvider = ({ children }) => {
   const cartCookie = Cookie.get("cart") !== "undefined" ? Cookie.get("cart") : null;
   
   const [user, setUser] = useState(null);
@@ -71,9 +71,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, cart, addItem, removeItem, resetCart, showCart, setShowCart }}>
+    <AppContext.Provider value={{ user, setUser, cart, addItem, removeItem, resetCart, showCart, setShowCart }}>
       {children}
-    </AuthContext.Provider>
+    </AppContext.Provider>
   );
 };
 
@@ -99,8 +99,8 @@ const getUser = async () => {
   return data.me;
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) throw new Error("useAuth must be used within an AuthProvider");
+export const useAppContext = () => {
+  const context = useContext(AppContext);
+  if (context === undefined) throw new Error("useAppContext must be used within an AppProvider");
   return context;
 };
