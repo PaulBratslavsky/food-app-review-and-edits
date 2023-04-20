@@ -1,4 +1,5 @@
 import { useAuth } from "@/context/AuthContext";
+import { centsToDollars } from "@/utils/centsToDollars";
 
 function CartItem({ data }) {
   const { addItem, removeItem } = useAuth();
@@ -9,7 +10,7 @@ function CartItem({ data }) {
         <div className="flex flex-col h-full">
           <h6 className="font-bold text-white mb-1">{attributes.name}</h6>
           <span className="block pb-4 mb-auto font-medium text-gray-400">
-            {quantity} x ${attributes.price.toFixed(2)}
+            {quantity} x ${centsToDollars(attributes.priceInCents)}
           </span>
         </div>
       </div>
@@ -30,7 +31,7 @@ function CartItem({ data }) {
             </button>
           </div>
           <span className="block mt-2 text-sm font-bold text-white">
-            ${(attributes.price * quantity).toFixed(2)}
+            ${centsToDollars(attributes.priceInCents * quantity)}
           </span>
         </div>
       </div>
@@ -40,34 +41,34 @@ function CartItem({ data }) {
 
 export default function CheckoutCart() {
   const { cart } = useAuth();
-  const total = cart.total.toFixed(2);
+  const total = cart.total;
   const displayTotal = Math.abs(total);
 
   return (
-        <div className="rounded-2xl co bg-gray-800">
-          <div className="max-w-lg pt-6 pb-8 px-8 mx-auto bg-blueGray-900">
-            <div className="flex mb-10 items-center justify-between">
-              <h6 className="font-bold text-2xl text-white mb-0">Your Cart</h6>
-            </div>
+    <div className="rounded-2xl co bg-gray-800">
+      <div className="max-w-lg pt-6 pb-8 px-8 mx-auto bg-blueGray-900">
+        <div className="flex mb-10 items-center justify-between">
+          <h6 className="font-bold text-2xl text-white mb-0">Your Cart</h6>
+        </div>
 
-            <div>
-              {cart.items
-                ? cart.items.map((item, index) => {
-                    if (item.quantity > 0) {
-                      return <CartItem key={index} data={item} />;
-                    }
-                  })
-                : null}
-            </div>
-            <div className="p-6">
-              <div className="flex mb-6 content-center justify-between">
-                <span className="font-bold text-white">Order total</span>
-                <span className="text-sm font-bold text-white">
-                  ${displayTotal}
-                </span>
-              </div>
-            </div>
+        <div>
+          {cart.items
+            ? cart.items.map((item, index) => {
+                if (item.quantity > 0) {
+                  return <CartItem key={index} data={item} />;
+                }
+              })
+            : null}
+        </div>
+        <div className="p-6">
+          <div className="flex mb-6 content-center justify-between">
+            <span className="font-bold text-white">Order total</span>
+            <span className="text-sm font-bold text-white">
+              ${centsToDollars(displayTotal)}
+            </span>
           </div>
         </div>
+      </div>
+    </div>
   );
 }

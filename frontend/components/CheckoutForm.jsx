@@ -1,7 +1,11 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
+import { client } from "@/pages/_app.js";
+import { gql } from "@apollo/client";
+import Cookie from "js-cookie";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/router";
+import { useInitialRender } from "@/utils/useInitialRender";
 
 const options = {
   style: {
@@ -18,78 +22,120 @@ const options = {
   },
 };
 
-function CardSection({ submitOrder, user }) {
-  return (
-    <div className="p-6">
-      <span>Credit or debit card</span>
-      <div className="my-4">
-        <CardElement options={options} />
-      </div>
-      <button
-        className="inline-block w-full px-6 py-3 text-center font-bold text-white bg-green-500 hover:bg-green-600 transition duration-200 rounded-full"
-        onClick={submitOrder}
-      >
-        {user ? "Confirm Order" : "Login to Order"}
-      </button>
-    </div>
-  );
-}
-
 const INITIAL_STATE = {
   address: "",
   city: "",
   state: "",
-  stripe_id: "",
+  error: null,
 };
 
 export default function CheckoutForm() {
   const [data, setData] = useState(INITIAL_STATE);
-  const { user, cart } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const { user, cart, resetCart, setShowCart } = useAuth();
+
+  const initialRender = useInitialRender();
+  if (!initialRender) return null;
+
   const stripe = useStripe();
-  const router = useRouter();
   const elements = useElements();
+  const router = useRouter();
 
   function onChange(e) {
     const updateItem = (data[e.target.name] = e.target.value);
     setData({ ...data, updateItem });
-    console.log(data);
   }
 
-  async function submitOrder() {
-    alert("Order submitted");
-    // const cardElement = elements.getElement(CardElement);
-    // const token = await stripe.createToken(cardElement);
-    // const userToken = Cookies.get("token");
+  async function submitOrder(e) {
+    e.preventDefault();
+    const cardElement = elements.getElement(CardElement);
+    const token = await stripe.createToken(cardElement);
 
-    // try {
-    //   const response = await fetch(
-    //     `${process.env.STRAPI_URL || "http://127.0.0.1:1337"}/api/orders`,
-    //     {
-    //       method: "POST",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //         Authorization: `Bearer ${userToken}`,
-    //       },
-    //       body: JSON.stringify({
-    //         amount: Number(Math.round(appContext.cart.total + "e2") + "e-2"),
-    //         dishes: appContext.cart.items,
-    //         address: data.address,
-    //         city: data.city,
-    //         state: data.state,
-    //         token: token.token.id,
-    //       }),
-    //     }
-    //   );
+    if (data.address === "") {
+      setData({ ...data, error: { message: "Address is required" } });
+      return;
+    }
 
-    //   if (response.status === 200) {
-    //     alert("Transaction Successful, continue your shopping");
-    //     router.push("/");
-    //   } else {
-    //     alert(response.statusText);
-    //   }
-    // } catch (error) {
-    //   console.log("error", error);
-    // }
+    if (data.city === "") {
+      setData({ ...data, error: { message: "City is required" } });
+      return;
+    }
+
+    if (data.state === "") {
+      setData({ ...data, error: { message: "State is required" } });
+      return;
+    }
+
+    if (token.error) {
+      setData({ ...data, error: { message: token.error.message } });
+      return;
+    }
+
+    const jwt = Cookie.get("token");
+
+    try {
+      setLoading(true);
+
+      const {
+        data: response,
+        error,
+        loading,
+      } = await client.mutate({
+        mutation: gql`
+          mutation CreateOrder(
+            $amount: Int
+            $dishes: JSON
+            $address: String
+            $city: String
+            $state: String
+            $token: String
+          ) {
+            createOrder(
+              data: {
+                amount: $amount
+                dishes: $dishes
+                address: $address
+                city: $city
+                state: $state
+                token: $token
+              }
+            ) {
+              data {
+                id
+                attributes {
+                  token
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          amount: cart.total,
+          dishes: cart.items,
+          address: data.address,
+          city: data.city,
+          state: data.state,
+          token: token.token.id,
+        },
+        context: {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        },
+      });
+
+      if (response.createOrder.data) {
+        alert("Transaction Successful, continue your shopping");
+        setData(INITIAL_STATE);
+        resetCart();
+        setShowCart(true);
+        router.push("/");
+      }
+    } catch (error) {
+      setData({ ...data, error: { message: error.message } });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -150,7 +196,19 @@ export default function CheckoutForm() {
           </div>
         </div>
         {cart.items.length > 0 ? (
-          <CardSection user={user} submitOrder={submitOrder} />
+          <div className="p-6">
+            <div>Credit or debit card</div>
+            <div className="my-4">
+              <CardElement options={options} />
+            </div>
+            <button
+              className="inline-block w-full px-6 py-3 text-center font-bold text-white bg-green-500 hover:bg-green-600 transition duration-200 rounded-full"
+              onClick={(e) => (user ? submitOrder(e) : router.push("/login"))}
+              disabled={loading}
+            >
+              {loading ? "Submitting" : "Submit Order"}
+            </button>
+          </div>
         ) : (
           <div className="text-center">
             <h1 className="text-2xl font-semibold">Your cart is empty</h1>
@@ -159,6 +217,14 @@ export default function CheckoutForm() {
             </p>
           </div>
         )}
+        <div>
+          {data.error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+              <strong className="font-bold">Error!</strong>{" "}
+              <span className="block sm:inline">{data.error.message}</span>
+            </div>
+          )}
+        </div>
       </div>
     </form>
   );

@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
       };
       setCart(prevCart => ({
         items: [...prevCart.items, newItem],
-        total: prevCart.total + item.attributes.price,
+        total: prevCart.total + item.attributes.priceInCents,
       }));
     } else {
       setCart(prevCart => ({
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
             ? { ...i, quantity: i.quantity + 1 }
             : i
         ),
-        total: prevCart.total + item.attributes.price,
+        total: prevCart.total + item.attributes.priceInCents,
       }));
     }
   };
@@ -56,18 +56,22 @@ export const AuthProvider = ({ children }) => {
             ? { ...i, quantity: i.quantity - 1 }
             : i
         ),
-        total: prevCart.total - item.attributes.price,
+        total: prevCart.total - item.attributes.priceInCents,
       }));
     } else {
       setCart(prevCart => ({
         items: prevCart.items.filter(i => i.id !== item.id),
-        total: prevCart.total - item.attributes.price,
+        total: prevCart.total - item.attributes.priceInCents,
       }));
     }
   };
 
+  const resetCart = () => {
+    setCart({ items: [], total: 0 });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, setUser, cart, addItem, removeItem, showCart, setShowCart }}>
+    <AuthContext.Provider value={{ user, setUser, cart, addItem, removeItem, resetCart, showCart, setShowCart }}>
       {children}
     </AuthContext.Provider>
   );
