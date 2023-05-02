@@ -25,6 +25,7 @@ const QUERY = gql`
 `;
 
 function RestaurantCard({ data }) {
+
   return (
     <div className="w-full md:w-1/2 lg:w-1/3 p-4">
       <div className="h-full bg-gray-100 rounded-2xl">
@@ -32,7 +33,7 @@ function RestaurantCard({ data }) {
           className="w-full rounded-2xl"
           height={300}
           width={300}
-          src={`${process.env.STRAPI_URL || "http://localhost:1337"}${
+          src={`${process.env.STRAPI_URL || "http://127.0.0.1:1337"}${
             data.attributes.image.data[0].attributes.url
           }`}
           alt=""
@@ -63,7 +64,9 @@ function RestaurantCard({ data }) {
 function RestaurantList(props) {
   const { loading, error, data } = useQuery(QUERY);
 
-  if (error) return "Error loading restaurants";
+  if (error) {
+    console.log(error)
+    return "Error loading restaurants"};
   if (loading) return <Loader />;
 
   if (data.restaurants.data && data.restaurants.data.length) {
@@ -79,6 +82,7 @@ function RestaurantList(props) {
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-wrap -m-4 mb-6">
               {searchQuery.map((res) => {
+                console.log(res)
                 return <RestaurantCard key={res.id} data={res} />;
               })}
             </div>
