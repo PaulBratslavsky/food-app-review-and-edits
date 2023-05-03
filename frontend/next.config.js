@@ -1,5 +1,4 @@
 /** @type {import('next').NextConfig} */
-const url = new URL(process.env.STRAPI_URL);
 
 const nextConfig = {
   reactStrictMode: true,
