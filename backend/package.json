@@ -2,7 +2,7 @@
   "name": "backend",
   "private": true,
   "version": "0.1.0",
-  "description": "A Strapi application",
+  "description": "A Strapi Application",
   "scripts": {
     "develop": "strapi develop",
     "start": "strapi start",
@@ -14,7 +14,9 @@
     "@strapi/plugin-i18n": "4.9.0",
     "@strapi/plugin-users-permissions": "4.9.0",
     "@strapi/strapi": "4.9.0",
-    "pg": "8.8.0",
+    "pg": "^8.8.0",
+    "pg-connection-string": "^2.5.0",
+    "sharp": "^0.32.1",
     "stripe": "^12.1.1"
   },
   "author": {
